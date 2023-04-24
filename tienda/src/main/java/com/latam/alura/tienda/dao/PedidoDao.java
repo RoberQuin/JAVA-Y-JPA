@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 
 import com.latam.alura.tienda.modelo.Categoria;
 import com.latam.alura.tienda.modelo.Pedido;
+import com.latam.alura.tienda.vo.RelatorioDeVenta;
 
 public class PedidoDao {
 	
@@ -39,19 +40,32 @@ public class PedidoDao {
 		return em.createQuery(jqpl,Pedido.class).getResultList();
 	}
 	
-	public List<Pedido> consultaPorNombre(String nombre){
-		String jpql =" SELECT P FROM Pedido AS P WHERE P.nombre=:nombre ";
-		return em.createQuery(jpql,Pedido.class).setParameter("nombre", nombre).getResultList();
+	public BigDecimal valorTotalVendido() {
+		String jpql="SELECT SUM(p.valorTotal) FROM Pedido p";
+		return em.createQuery(jpql, BigDecimal.class).getSingleResult();
 	}
 	
-	public List<Pedido> consultaPorNombreDeCategoria(String nombre){
-		String jpql="SELECT p FROM Pedido AS p WHERE p.categoria.nombre=:nombre";
-		return em.createQuery(jpql,Pedido.class).setParameter("nombre", nombre).getResultList();
+	public List<Object[]> relatorioDeVentas(){
+		String jpql="SELECT producto.nombre, "
+				+ "SUM(item.cantidad), "
+				+ "MAX(pedido.fecha) "
+				+ "From Pedido pedido "
+				+ "JOIN pedido.items item "
+				+ "JOIN item.producto producto "
+				+ "GROUP BY producto.nombre "
+				+ "ORDER BY item.cantidad DESC";
+		return em.createQuery(jpql,Object[].class).getResultList();
 	}
-	 
-	public BigDecimal consultarPrecioPorNombreDePedido(String nombre) {
-		String jpql="SELECT P.precio FROM Pedido AS P WHERE P.nombre=:nombre";
-		return em.createQuery(jpql,BigDecimal.class).setParameter("nombre", nombre).getSingleResult();
+	
+	public List<RelatorioDeVenta> relatorioDeVentasVO(){
+		String jpql="SELECT new com.latam.alura.tienda.vo.RelatorioDeVenta(producto.nombre, "
+				+ "SUM(item.cantidad), "
+				+ "MAX(pedido.fecha)) "
+				+ "From Pedido pedido "
+				+ "JOIN pedido.items item "
+				+ "JOIN item.producto producto "
+				+ "GROUP BY producto.nombre "
+				+ "ORDER BY item.cantidad DESC";
+		return em.createQuery(jpql,RelatorioDeVenta.class).getResultList();
 	}
-
 }

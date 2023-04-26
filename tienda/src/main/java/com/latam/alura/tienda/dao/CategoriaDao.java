@@ -1,6 +1,8 @@
 package com.latam.alura.tienda.dao;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 
 import com.latam.alura.tienda.modelo.Categoria;
 
@@ -26,7 +28,12 @@ public class CategoriaDao {
 	}
 
 	public Categoria consultaPorNombre(String nombre){
-	    String jpql =" SELECT C FROM Categoria AS C WHERE C.nombre=:nombre ";
-	    return em.createQuery(jpql,Categoria.class).setParameter("nombre", nombre).getSingleResult();
+	    String jpql ="SELECT C FROM Categoria AS C WHERE C.nombre=:nombre";
+	    TypedQuery<Categoria> query=em.createQuery(jpql,Categoria.class).setParameter("nombre", nombre);
+	    try {
+	    return query.getSingleResult();
+	    }catch(NoResultException ex) {
+	    	return null;
+	    }
 	}
 }

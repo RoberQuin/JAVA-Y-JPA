@@ -23,7 +23,8 @@ public class RegistroDeProducto {
 	    BigDecimal precio = productoDao.consultarPrecioPorNombreDeProducto("Xiaomi Redmi");
 	    System.out.println(precio);
 	    
-	    em.find(Categoria.class, new CategoriaId("CELULARES", "456"));
+	    Categoria find = em.find(Categoria.class, new CategoriaId("CELULARES", "456"));
+	    System.out.println(find.getNombre());
 
 	}
 
